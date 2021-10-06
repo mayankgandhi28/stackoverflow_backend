@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :posts
+      resources :comments
       post "/signup" => "users#signup"
       post "/login" => "users#login"
     end
