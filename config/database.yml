@@ -1,0 +1,12 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  host: localhost
+  port: 5432
+  timeout: 5000
+development:
+  <<: *default
+  username: postgres
+  password: changeit
+  database: stackoverflow
