@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       resources :posts
       resources :comments
+      resources :votes
       post "/signup" => "users#signup"
       post "/login" => "users#login"
     end
