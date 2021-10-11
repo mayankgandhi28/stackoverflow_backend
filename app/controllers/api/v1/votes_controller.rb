@@ -3,10 +3,11 @@ module Api
     class VotesController < BaseController
       before_action :authorize_request
       before_action :get_vote, only: [:show, :update, :destroy]
+      before_action :validate_params, only: [:create, :update]
 
       def create
-        comment = Comment.find_by(id: params[:id].to_i)
-        vote = comment.votes.create(is_up: params[:vote_up], is_down: params[:vote_down], user_id: @current_user.id)
+        comment = Comment.find_by(id: params[:id].to_i) if params[:id].present?
+        vote = comment.votes.create(is_up: params[:vote_up], is_down: params[:vote_down], user_id: @current_user.id) if comment.present?
         render json: { message: "vote added Successfully.", status: 200 } and return
       end
 
@@ -25,6 +26,12 @@ module Api
       end
 
       private
+
+      def validate_params
+        if params[:vote_up] && params[:vote_down]
+          render json: { error: "vote up and down simultaneously not allowed", status: 400} and return
+        end
+      end
 
       def get_vote
         @vote = @current_user.votes.find_by(id: params[:id])

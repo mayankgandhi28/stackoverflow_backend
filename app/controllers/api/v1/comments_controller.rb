@@ -10,19 +10,26 @@ module Api
       end
 
       def create
-        comment = @current_user.comments.create(comment_params)
-        post = Post.find_by(id: params[:id])
-        comment.update(post_id: post&.id)
-        render json: { message: "comment added Successfully.", status: 200 } and return
+        comment = @current_user.comments.new(comment_params)
+        if comment.save
+          post = Post.find_by(id: params[:id]) if params[:id].present?
+          comment.update(post_id: post&.id) if post.present?
+          render json: { message: "comment added Successfully.", status: 200 }
+        else
+          render json: { error: comment.errors.full_messages.to_sentence, status: 400 }
+        end
       end
 
       def show
-        render json: {message: "Comment Details.", comment: CommentSerializer.new(@comment, root: false), status: 200} and return
+        render json: {message: "Comment Details.", comment: CommentSerializer.new(@comment, root: false), status: 200}
       end
 
       def update
-        @comment.update(comment_params)
-        render json: {message: "Comment updated Successfully.", comment: CommentSerializer.new(@comment, root: false), status: 200} and return
+        if @comment.update(comment_params)
+          render json: {message: "Comment updated Successfully.", comment: CommentSerializer.new(@comment, root: false), status: 200}
+        else
+          render json: { error: @comment.errors.full_messages.to_sentence, status: 400 }
+        end
       end
 
       def destroy

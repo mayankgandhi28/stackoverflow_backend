@@ -10,22 +10,29 @@ module Api
       end
 
       def create
-        post = @current_user.posts.create(post_params)
-        render json: { message: "Post Created Successfully.", status: 200 } and return
+        post = @current_user.posts.new(post_params)
+        if post.save
+          render json: { message: "Post Created Successfully.", status: 200 }
+        else
+          render json: { error: post.errors.full_messages.to_sentence, status: 400 }
+        end
       end
 
       def show
-        render json: {message: "Post Details.", post: PostSerializer.new(@post, root: false), status: 200} and return
+        render json: {message: "Post Details.", post: PostSerializer.new(@post, root: false), status: 200}
       end
 
       def update
-        @post.update(post_params)
-        render json: {message: "Post updated Successfully.", post: PostSerializer.new(@post, root: false), status: 200} and return
+        if @post.update(post_params)
+          render json: {message: "Post updated Successfully.", post: PostSerializer.new(@post, root: false), status: 200}
+        else
+          render json: { error: @post.errors.full_messages.to_sentence, status: 400 }
+        end
       end
 
       def destroy
         @post.destroy
-        render json: {message: "Post Deleted Successfully.", status: 200} and return
+        render json: {message: "Post Deleted Successfully.", status: 200}
       end
 
       private
